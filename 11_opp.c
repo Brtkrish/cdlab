@@ -30,6 +30,19 @@ int main()
     scanf("%s", input);
     strcat(input, "$");
 
+    /* operand/operator adjacency check (e.g. rejects i+*i, (+i), i(i) ) */
+    int expectOperand = 1, depth = 0;
+    for (int k = 0; input[k] != '$'; k++)
+    {
+        char c = input[k];
+        if (expectOperand && (c == 'i' || c == '(')) { if (c == '(') depth++; }
+        else if (!expectOperand && (c == '+' || c == '*')) expectOperand = 1;
+        else if (!expectOperand && c == ')' && depth > 0) depth--;
+        else { printf("String Rejected\n"); return 0; }
+        if (c == 'i' || c == ')') expectOperand = 0;
+    }
+    if (expectOperand || depth) { printf("String Rejected\n"); return 0; }
+
     stack[++top] = '$';
     int ip = 0;
 
@@ -58,12 +71,13 @@ int main()
         }
         else
         {
+            char last;
             do
             {
-                top--;
+                last = stack[top--];
+                if (top < 0) { printf("String Rejected\n"); return 0; }
                 a = stack[top];
-                x = indexOf(a);
-            } while (precedence[x][y] != '<');
+            } while (precedence[indexOf(a)][indexOf(last)] != '<');
         }
     }
     return 0;

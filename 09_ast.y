@@ -1,12 +1,16 @@
-%{
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
+%code requires {
 typedef struct Node {
     char data[20];
     struct Node *left, *right;
 } Node;
+}
+
+%code {
+#include <stdio.h>
+int yylex(void);
+int yyerror(char *s);
+#include <stdlib.h>
+#include <string.h>
 
 Node *createNode(char *data, Node *left, Node *right)
 {
@@ -24,7 +28,7 @@ void preorder(Node *root)
     preorder(root->left);
     preorder(root->right);
 }
-%}
+}
 
 %union {
     char *str;

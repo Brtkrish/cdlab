@@ -1,3 +1,4 @@
+%option noyywrap
 %{
 #include "y.tab.h"
 #include <string.h>

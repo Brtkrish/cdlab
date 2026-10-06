@@ -17,4 +17,4 @@
 | 13_rdp.c | Recursive descent parser for expressions |
 | 14_shiftreduce.c | Shift-reduce parser |
 
-Build: `gcc x.c -o x` | LEX: `flex x.l && gcc lex.yy.c -o x` | LEX+YACC: `bison -dy x.y && flex x.l && gcc y.tab.c lex.yy.c -o x`
+Build: `gcc x.c -o x` | LEX: `flex x.l && gcc lex.yy.c -o x` | LEX+YACC: `bison -d -o y.tab.c x.y && flex x.l && gcc y.tab.c lex.yy.c -o x`

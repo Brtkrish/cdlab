@@ -1,5 +1,7 @@
 %{
 #include <stdio.h>
+int yylex(void);
+int yyerror(char *s);
 %}
 
 %token LETTER DIGIT

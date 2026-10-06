@@ -2,92 +2,99 @@
 #include <string.h>
 #include <ctype.h>
 
-char productions[10][20];
-char first[26][20], follow[26][20];
-int n;
+char prod[20][20];          /* prod[i] = "E=TA", '#' is epsilon */
+char first[26][30], follow[26][30];
+int n, changed;
 
-void add(char *set, char c)
+int add(char *set, char c)
 {
-    if (!strchr(set, c))
-    {
-        int len = strlen(set);
-        set[len] = c;
-        set[len + 1] = '\0';
-    }
+    if (strchr(set, c)) return 0;
+    int len = strlen(set);
+    set[len] = c;
+    set[len + 1] = '\0';
+    changed = 1;
+    return 1;
 }
 
-void FIRST(char c, char *result)
+/* add FIRST of string s to set; return 1 if whole string can derive epsilon */
+int firstOfString(char *s, char *set)
 {
-    if (!isupper(c))
+    for (int i = 0; s[i]; i++)
     {
-        add(result, c);
-        return;
-    }
-
-    for (int i = 0; i < n; i++)
-        if (productions[i][0] == c)
+        char c = s[i];
+        if (!isupper(c))
         {
-            char x = productions[i][3];
-            if (x == '#') add(result, '#');
-            else FIRST(x, result);
+            if (c != '#') add(set, c);
+            return c == '#';
         }
+        int eps = 0;
+        for (int j = 0; first[c - 'A'][j]; j++)
+        {
+            if (first[c - 'A'][j] == '#') eps = 1;
+            else add(set, first[c - 'A'][j]);
+        }
+        if (!eps) return 0;
+    }
+    return 1;
+}
+
+void printSet(char *name, char nt, char *set)
+{
+    printf("%s(%c) = { ", name, nt);
+    for (int i = 0; set[i]; i++) printf("%c ", set[i]);
+    printf("}\n");
 }
 
 int main()
 {
+    char order[26], seen[26] = {0};
+    int count = 0;
+
     printf("Enter number of productions: ");
     scanf("%d", &n);
-
     printf("Use # for epsilon. Example: E=TA\n");
     for (int i = 0; i < n; i++)
-        scanf("%s", productions[i]);
-
-    printf("\nFIRST:\n");
-    for (int i = 0; i < n; i++)
     {
-        char nt = productions[i][0];
-        if (first[nt-'A'][0] == '\0')
-            FIRST(nt, first[nt-'A']);
-
-        printf("FIRST(%c) = { ", nt);
-        for (int j = 0; j < strlen(first[nt-'A']); j++)
-            printf("%c ", first[nt-'A'][j]);
-        printf("}\n");
+        scanf("%s", prod[i]);
+        int k = prod[i][0] - 'A';
+        if (!seen[k]) { seen[k] = 1; order[count++] = prod[i][0]; }
     }
 
-    add(follow[productions[0][0]-'A'], '$');
+    /* FIRST */
+    do {
+        changed = 0;
+        for (int i = 0; i < n; i++)
+            if (firstOfString(prod[i] + 2, first[prod[i][0] - 'A']))
+                add(first[prod[i][0] - 'A'], '#');
+    } while (changed);
 
-    for (int p = 0; p < n; p++)
-    {
-        char lhs = productions[p][0];
-
-        for (int i = 3; i < strlen(productions[p]); i++)
+    /* FOLLOW */
+    add(follow[prod[0][0] - 'A'], '$');
+    do {
+        changed = 0;
+        for (int p = 0; p < n; p++)
         {
-            char B = productions[p][i];
-
-            if (isupper(B))
+            char lhs = prod[p][0];
+            char *rhs = prod[p] + 2;
+            for (int i = 0; rhs[i]; i++)
             {
-                if (i + 1 < strlen(productions[p]))
-                {
-                    char next = productions[p][i+1];
-                    if (!isupper(next))
-                        add(follow[B-'A'], next);
-                }
-                else
-                    for (int j = 0; j < strlen(follow[lhs-'A']); j++)
-                        add(follow[B-'A'], follow[lhs-'A'][j]);
+                if (!isupper(rhs[i])) continue;
+                char B = rhs[i];
+                char tmp[30] = "";
+                int saved = changed;
+                int eps = firstOfString(rhs + i + 1, tmp);
+                changed = saved;   /* tmp is scratch, not a real change */
+                for (int j = 0; tmp[j]; j++) add(follow[B - 'A'], tmp[j]);
+                if (eps)
+                    for (int j = 0; follow[lhs - 'A'][j]; j++)
+                        add(follow[B - 'A'], follow[lhs - 'A'][j]);
             }
         }
-    }
+    } while (changed);
 
+    printf("\nFIRST:\n");
+    for (int i = 0; i < count; i++) printSet("FIRST", order[i], first[order[i] - 'A']);
     printf("\nFOLLOW:\n");
-    for (int i = 0; i < n; i++)
-    {
-        char nt = productions[i][0];
-        printf("FOLLOW(%c) = { ", nt);
-        for (int j = 0; j < strlen(follow[nt-'A']); j++)
-            printf("%c ", follow[nt-'A'][j]);
-        printf("}\n");
-    }
+    for (int i = 0; i < count; i++) printSet("FOLLOW", order[i], follow[order[i] - 'A']);
     return 0;
 }

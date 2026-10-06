@@ -4,7 +4,7 @@
 char stack[100];
 int top = -1;
 
-int reduce()
+int reduce(char next)
 {
     if (top >= 0 && stack[top] == 'i')
     {
@@ -15,7 +15,8 @@ int reduce()
     if (top >= 2 &&
         stack[top-2] == 'E' &&
         stack[top-1] == '+' &&
-        stack[top] == 'E')
+        stack[top] == 'E' &&
+        next != '*')          /* * has higher precedence: shift first */
     {
         top -= 2;
         stack[top] = 'E';
@@ -63,7 +64,7 @@ int main()
 
     while (1)
     {
-        if (reduce())
+        if (reduce(input[i]))
         {
             printf("Stack: ");
             display();
