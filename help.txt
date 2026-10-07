@@ -20,7 +20,7 @@
 | first.c      | FIRST and FOLLOW |
 | rd.c         | Recursive descent parser |
 | srp.c        | Shift-reduce parser |
-| regular.c    | 0n1n |
+| regular.l    | 0n1n |
 
 for lex only:
 flex programname.l 
