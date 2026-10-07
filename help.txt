@@ -1,0 +1,37 @@
+# Compiler Design Lab - Programs
+
+| File | Description |
+|---|---|
+| lex.c        | Lexical analyzer |
+| eclosure.c   | Epsilon closure |
+| enfa2nfa.c   | Epsilon-NFA to NFA |
+| nfa2dfa.c    | NFA to DFA |
+| mindfa.c     | DFA minimization |
+| reject.l     | Reject strings containing HELLO |
+| variable.l   | Variable lexer |
+| variable.y   | Variable validator |
+| calc.l       | Calculator lexer |
+| calc.y       | Calculator |
+| ast.l        | AST lexer |
+| ast.y        | Abstract syntax tree |
+| forloop.l    | FOR lexer |
+| forloop.y    | FOR syntax check |
+| opp.c        | Operator precedence parser |
+| first.c      | FIRST and FOLLOW |
+| rd.c         | Recursive descent parser |
+| srp.c        | Shift-reduce parser |
+| regular.c    | 0n1n |
+
+for lex only:
+flex programname.l 
+gcc lex.yy.c -o randomname
+./randomname
+
+for lex and yacc
+bison -y -d programname.y
+flex programname.l
+gcc lex.yy.c y.tab.c -o randomname
+./randomname
+
+
+

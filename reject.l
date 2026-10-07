@@ -3,8 +3,8 @@
 %}
 
 %%
-.*NIYA.*     { printf("Rejected: String contains NIYA\n"); }
-.*           { printf("Accepted: String does not contain NIYA\n"); }
+.*HELLO.*     { printf("Rejected: String contains HELLO\n"); }
+.*           { printf("Accepted: String does not contain HELLO\n"); }
 %%
 
 int yywrap() { return 1; }
